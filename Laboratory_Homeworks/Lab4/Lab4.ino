@@ -7,7 +7,7 @@ const int pinD = 11;
 const int pinE = 12;
 const int pinDP = 13;
 
-const int pinD1 = 2;
+const int pinD1 = 1;
 const int pinD2 = 3;
 const int pinD3 = 4;
 const int pinD4 = 5;
@@ -36,22 +36,27 @@ byte digitCode[10][segmentNo - 1] = {
     
   };
 
-const int pinX = A0;
-const int pinY = A1;
-const int pinSW = 1;
+const int pinX = A1;
+const int pinY = A0;
+const int pinSW = 2;
 int valX;
 int valY;
-int swState = 0;
-int lastSwState = 0;
-int swRead = 0;
 bool movedX = false;
 bool movedY = false;
 bool locked = false;
-const int minThreshold = 300;
-const int maxThreshold = 350;
+const int minThreshold = 350;
+const int maxThreshold = 650;
+
+int swState = 0;
+int lastSwState = 1;
+int swRead = 0;
+const unsigned long  debounceDelay = 100;
+unsigned long lastDebounceTime = 0;
 int currentDisplay = 0;
 int currentDigit = 0;
 int dpState = 0;
+int lockState = 0;
+
 
 void setup() {
   for(int i = 0; i<segmentNo; i++)
@@ -59,8 +64,6 @@ void setup() {
   for(int i = 0; i < digitNo; i++)
     pinMode(digits[i],OUTPUT);
    Serial.begin(9600);
-  pinMode(pinX,INPUT);
-  pinMode(pinY,INPUT);
   pinMode(pinSW,INPUT_PULLUP);
   
 }
@@ -70,7 +73,7 @@ void displayNumber(int Number, int DpState)
   for(int i = 0; i < segmentNo - 1; i++)
     digitalWrite(segments[i],digitCode[Number][i]);
 
-digitalWrite(segments[segmentNo],DpState);
+digitalWrite(segments[segmentNo-1],DpState);
 }
 
 void onCrt()
@@ -81,28 +84,23 @@ void onCrt()
 digitalWrite(segments[segmentNo - 1],HIGH);
 }
 
-void offCrt()
-{
-    for(int i = 0; i < segmentNo - 1; i++)
-    digitalWrite(segments[i],LOW);
 
-digitalWrite(segments[segmentNo - 1],LOW);
-
-  
-}
 void onDigit(int num)
 {
   for(int i = 0;i < digitNo; i++)
     digitalWrite(digits[i],HIGH);
    digitalWrite(digits[num],LOW);
 }
+
+
 void loop() {
-  valX = analogRead(pinX);
-  swState = digitalRead(pinSW);
-  Serial.println(valX);
-  Serial.print(" ");
-  Serial.print(swState);
-  Serial.print(" ");
+
+
+  //if not locked, we are interested in the value of X
+  if(locked == false)
+  {
+    valX = analogRead(pinX);
+    Serial.println(valX);
   
    if( valX <minThreshold && movedX == false)
     {
@@ -124,72 +122,90 @@ void loop() {
     }
    if(valX >= minThreshold && valX <= maxThreshold)
       {
-        //if locked on a certain display
-        if(locked == true)
-          movedX = true;
-        else
         movedX = false;
       }
-    swRead = digitalRead(pinSW); 
    if(movedX == true)
-   {
-        onDigit(currentDisplay);
-        onCrt();
-        delay(300);
-        offCrt();
-        
-       if(swRead != lastSwState)
+   {  onDigit(currentDisplay);
+      onCrt();
+   }
+  }
+//we finished reading the X, or we do not care about it
+  swRead = digitalRead(pinSW);
+  Serial.print("swRead: ");
+  Serial.print(swRead);
+  Serial.print("LastSw: ");
+  Serial.println(lastSwState);
+   Serial.print("Sw: ");
+  Serial.println(swState);
+  
+ if(swRead != lastSwState)
      {
-      // if a certain display is not locked 
+       lastDebounceTime = millis();
+     }
+ //waited long enough since the lastDebounce was triggered to consider it an actual press
+if(millis() - lastDebounceTime > debounceDelay)
+{
+  
+  if(swRead != swState)
+  {
+    
+    swState = swRead;
+    //only if the button input was pressed
+    if(swState == LOW)
+    {// if no display is locked
       if(locked == false)
        {
-          if(swRead == LOW)
          
-         {
           onDigit(currentDisplay);
           displayNumber(0,HIGH);
-          locked == true;
-          Serial.print("LOCKED ON :");
-          Serial.print(currentDisplay);
+          locked = true;
+          Serial.print("LOCKED ON : ");
+          Serial.println(currentDisplay);
           
-         }
        }
-
-      //if a certain disply is locked
+       
       else
-        if(locked == true) 
-    { 
-      
-      //If locked on a display read the valY
-       valY = analogRead(pinY);
-        Serial.print(valY);
-        
-          if( valY < minThreshold && movedY == false)
-    {
-           if(currentDigit == 9)
-            currentDigit = 0;
-           else
-           currentDigit--;
-           movedY = true;
-           
+      {
+            displayNumber(9,HIGH);
+            locked = false;
+            Serial.print("UNLOCKED ON :");
+            Serial.println(currentDisplay);
+            
+        }
+      }
     }
-          if( valY > maxThreshold && movedY == false)
-    {
-           if(currentDigit == 9)
-            currentDigit= 0;
-           else
-           currentDigit++;
-           movedY = true;
-        
-    }
-          if(valY >= minThreshold && valY <= maxThreshold)
-             movedY = false;
-      displayNumber(currentDigit,HIGH);
-      
-     }
-   //delay(200);
+    
 }
-   }
-   delay(200);
+ lastSwState = swRead;
+
+ if(locked == true)
+    {     
+        //If locked on a display read the valY
+         valY = analogRead(pinY);
+          
+            if( valY < minThreshold && movedY == false)
+      {
+             if(currentDigit == 9)
+              currentDigit = 0;
+             else
+             currentDigit--;
+             movedY = true;
+             
+      }
+            if( valY > maxThreshold && movedY == false)
+      {
+             if(currentDigit == 9)
+              currentDigit= 0;
+             else
+             currentDigit++;
+             movedY = true;
+          
+      }
+            if(valY >= minThreshold && valY <= maxThreshold)
+               movedY = false;
+        displayNumber(currentDigit,HIGH);
+        
+    }
+  
 }
   
