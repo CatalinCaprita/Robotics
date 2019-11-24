@@ -148,14 +148,14 @@ if(millis() - lastDebounceTime > debounceDelay)
   
   if(swRead != swState)
   {
-    
+    //if the state of the button has changed
     swState = swRead;
-    //only if the button input was pressed
+    //only if the button  was pressed
     if(swState == LOW)
     {// if no display is locked
       if(locked == false)
        {
-         
+         //then lock it 
           onDigit(currentDisplay);
           displayNumber(0,HIGH);
           locked = true;
@@ -166,6 +166,7 @@ if(millis() - lastDebounceTime > debounceDelay)
        
       else
       {
+        //if currentDisplay is locked, unlock it 
             displayNumber(9,HIGH);
             locked = false;
             Serial.print("UNLOCKED ON :");
@@ -176,6 +177,7 @@ if(millis() - lastDebounceTime > debounceDelay)
     }
     
 }
+//record the last state as it is going to be used for the next reading
  lastSwState = swRead;
 
  if(locked == true)
@@ -203,6 +205,7 @@ if(millis() - lastDebounceTime > debounceDelay)
       }
             if(valY >= minThreshold && valY <= maxThreshold)
                movedY = false;
+        //show a certain number if the joystick recorded a movement on Y axis
         displayNumber(currentDigit,HIGH);
         
     }
