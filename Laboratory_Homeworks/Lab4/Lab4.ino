@@ -7,7 +7,7 @@ const int pinD = 11;
 const int pinE = 12;
 const int pinDP = 13;
 
-const int pinD1 = 1;
+const int pinD1 = 0;
 const int pinD2 = 3;
 const int pinD3 = 4;
 const int pinD4 = 5;
@@ -205,9 +205,9 @@ if(millis() - lastDebounceTime > debounceDelay)
       }
             if(valY >= minThreshold && valY <= maxThreshold)
                movedY = false;
-        //show a certain number if the joystick recorded a movement on Y axis
+        //show a certain number
         displayNumber(currentDigit,HIGH);
-        
+        delay(200);
     }
   
 }

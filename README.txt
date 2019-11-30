@@ -55,3 +55,45 @@ or decreases accordingly and the DP of that display is lit.
 the sw signal via "swRead" and if the "swState" is "LOW", i.e the button is pressed, we either lock on the 
 currentDisplay, meaning via the functinon onDigit() we turn off the other displays and turn on the selected one.
 	This way, we check continuously for the locked state and read what value we are interested in.  
+
+/*------------------------------*/
+Laboratory No.5 file: Lab5/Lab5.ino
+	There are a number of function which characterizes every state of the menu :
+I. The "void mainMenu()" displays the main menu options on the lcd using lcd.print() and lcd.clear()
+The "showCrt(const int cursorLine,const int cursorPos)" function is used to set the cursor on the line and
+column indicated by the parameters given and it updated according to it. 
+Each time a movement of the X-axis joystick is detected , i.e. if the valX read from pinX(A0) is greater than
+maxThreshold or smaller than minThreshold, the cursor position is updated via the showCrt() function. This happens
+for every menu section, either mainMenu or options Menu;
+
+	The boolean "selected" is used to keep track of an option being selected either Play or Options form the LCD.
+ A detection is recognized via the readSW() function which is essentailly a debounce paradigm to record whenever 
+change of the state of the SW button from the joystick happens. If the button is pressed, the function returns 1,
+or 0 otherwise.
+	If "selected" is false, it means no option has been chosen , thus the mainMenu configurations is displayed.
+	Otherwise, either "Play" or "Options" has been selected, in which case, selected becomes true, and so
+either one of the booleans "playing" or "options" is set to true.
+
+II. The "void opts()" function displays the Options menu, in which the starting level can be selected.
+The same mechanism of choice is used with the showCrt() function diplaying the current position of the selective
+cursor and the readSW() is used to record a press of a button.The "opts()" function is called in loop() only if selected has been 
+set to true.
+	The global boolean optSelected becomes true if and only if the button has been pressed, i.e. readSW() returns 1,
+and the cursor was positioned on the "Set Starting Level" option, i.e. line 0 row 0 on the LCD.
+	II.a) The "void setLevel()" function displays the currentStartingLevel variable and , by means of the same mechanisms using
+the analogRead() of pinX , if the joystick is moved upwards, i.e, valX >= maxThreshold, then the currentStartingLevel variable is incremented
+and displayed on the screen. Otherwise, if the joystick is moved downwards, i.e valX <= minThreshold,the currentStartingLevel variable is decremented
+Usign the readSW() function, if the button has been pressed, the startLevel global variable is set to the value of currentStartingLevel.
+This funciton is only called when the optSelected variable is true.Once the button is pressed, optSelected becomes false, which on the LCD 
+means that we are returning to the configuration rendered by the opts() function.
+	II.b) If the button has been pressed and Exit on the LCD has been selected, meaning the cursor is on line 1 column 0 of the matrix,
+then selected = false,meaning by the next iteration of the loop() function, the configuration rendered on the LCD will be the one of mainMenu();
+
+III.The "inGame()" function renders as requested, the number of Lives, the Score of the player, memorised using the variable currentLevel multiplyed by 3
+as well as the current level. This function is called only if the selected variable is true, and when the button was pressed, the cursorLine was 1 
+and cursorPos was 0. Each time a new game starts, the lastUpdate variable is used to keep track of how many seconds have been spent in the game.
+if the differnece between current time ( millis() ) and the lastUpdate is greater than a second, it means that inGameTime variable is incremented.
+Once inGameTime is greater than the const int maxGameTime, it means the game must end.Thus, the variable "playing" is set to false and so is the
+variable "selected" so the LCD can display again the mainMenu configuration.Before "exiting: the game we check if the currentScore is greater than
+the highest score memorised int the global variable highScore. If so, a message is shown and highScore is updated.
+finally, the endGame() function is called which renders a congrationating message.
