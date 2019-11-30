@@ -97,3 +97,4 @@ Once inGameTime is greater than the const int maxGameTime, it means the game mus
 variable "selected" so the LCD can display again the mainMenu configuration.Before "exiting: the game we check if the currentScore is greater than
 the highest score memorised int the global variable highScore. If so, a message is shown and highScore is updated.
 finally, the endGame() function is called which renders a congrationating message.
+Link to the video :https://www.youtube.com/watch?v=eWqoPUFmz84 ;
