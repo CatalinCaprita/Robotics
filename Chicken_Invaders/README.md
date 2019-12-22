@@ -15,7 +15,7 @@ so ARM UP AND FIGHT FOR YOUR LIFE!
 * [How To Play?](#how-to-play)
 * [Demonstrative Video](#demonstrative-video)
 * [Technologies](#technologies)
-* [Hardware Components])(#hardware-components)
+* [Hardware Components](#hardware-components)
 
 
 ## General Info
@@ -45,7 +45,7 @@ is likely to have between 1 and the level number of lives so if they don't get e
 
 ## Demonstrative Video
 --- 
-[Link](https://www.youtube.com/watch?v=rVG6xQdty2I)
+[Link]YouTube Video Demo(https://www.youtube.com/watch?v=rVG6xQdty2I)
 ## Technologies
 ---
 * C++ version: 11 

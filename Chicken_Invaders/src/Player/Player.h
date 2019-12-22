@@ -2,6 +2,14 @@
 #include "LedControl.h"
 #ifndef PLAYER_H
 #define PLAYER_H
+#define SPAWNX 4
+#define SPAWNY 7
+/*The Player class is used to represent all that the player could do
+ - Shooting a projectile towards enemies
+ - Moving left-right, up-down
+ - Die
+ - Respawn
+ */
 
 class Game;
 class Player
@@ -15,18 +23,17 @@ class Player
     int score;
     int lives;
     bool shooting;
-    const long blinkInterval;
-    const long updateInterval;
+    const long blinkInterval;  //the rate at which the bullet travels
+    const long updateInterval; // the speed at which the player changes positon on the map
     long lastBlink;
-    long lastBullet;
+    long lastBullet;  //keep track of the last time a bullet was shot or its position has been updated
     long lastOn;
-    long lastUpdate;
+    long lastUpdate;  //keep track of the last time the player positon has been updated
     friend class Game;
     public:
-        Player(int = 4,int = 7);
+        Player(int = SPAWNX,int = SPAWNY);
         virtual ~Player();
         void updatePos(int,int,const int,LedControl &);
-        bool hasShield();
         byte livesLeft(){return lives;};
         byte getX(){ return posX;}
         byte getY(){ return posY;}

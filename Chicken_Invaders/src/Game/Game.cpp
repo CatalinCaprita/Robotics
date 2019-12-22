@@ -6,6 +6,8 @@
 #include "Joystick.h"
 #include "LedControl.h"
 #include "EEPROM.h"
+
+//Constant for Various Cursor Positions on the LCD MENU
 #define PLAY 0
 #define OPTIONS 8
 #define SETNAME 0
@@ -17,7 +19,9 @@
 #define REPLAY 0
 #define MENU 8
 #define INFO 16
-#define HIADDR 0
+#define HIADDR 0 //Address at which to store the highest Score in EEPROM
+
+// Level Configurations, where 1 represents the position of an enemy
 const byte Game::levels[LEVELS][MAPSIZE * MAPSIZE] =
 {
   //Level 1
@@ -71,8 +75,7 @@ const byte Game::levels[LEVELS][MAPSIZE * MAPSIZE] =
 const int Game::dx[LEVELS][LEVELS] =
 
 {
-    //movement pattern for level 1 is nothing. getting accustomed to
-    //gameplay
+    //movement pattern for level 1 is a simple left contiguous movement
     {-1,0,0,0,0},
 
     //at level 2 enemies will move 2 times left, 2 times right
@@ -83,14 +86,14 @@ const int Game::dx[LEVELS][LEVELS] =
 
     //level 4 will have a circular motion of range 1
     {-1,-1,1,1,0},
+
     //level 5 will have a square motion of offfset 1
     {-1,0,1,0,0}
 };
 
 const int Game::dy[LEVELS][LEVELS] =
 {
-    //movement pattern for level 1 is nothing. getting accustomed to
-    //gameplay
+    //movement pattern for level 1 is nothing,only movement on the X Axis
     {0,0,0,0,0},
     //at level 2 enemies will move 2 times left, 2 times right
     {0,0,0,0,0},
@@ -112,7 +115,7 @@ d6 = 5;
 d7  = 6;
 */
 
-//The manu will return true if Play was not selected;
+//The menu will return true if Play was not selected;
 //Otherwise, return false;
 int Game::menuDisplay()
 {
@@ -140,6 +143,8 @@ int Game::menuDisplay()
             else
                 cursorPosition += OPTIONS;
         }
+
+        //whenever a change in the Menu Page is detected, re-render the Menu Display
         if(cursorPosition == INFO)
         {
             menu.clear();
@@ -150,6 +155,7 @@ int Game::menuDisplay()
             menu.clear();
             mainMenu();
         }
+        //Whenever the joystick records a press of the SW button
         if(j.debounce() == 1)
             {
                 if(cursorPosition == OPTIONS)
@@ -173,7 +179,7 @@ int Game::menuDisplay()
                 {
                     lastScroll = millis();
                     menu.clear();
-                    return 3;
+                    return 3; // value 3 means INFO has been selected on the menu
                 }
             }
         lastScroll = millis();
@@ -200,6 +206,9 @@ void Game::showInfo()
     showCrs(cursorPosition % INFO,cursorLine);
     menu.print("INFO");
 }
+
+//Printing Routine of the INFO section
+//DELAY is used only in order to make a readable interval of time between messages
 void Game::showInfo2()
 {
     menu.setCursor(0,0);
@@ -242,12 +251,13 @@ int Game::optionsDisplay()
                    cursorLine--;
         if(valY == 1)
                 if(cursorLine == EXIT)
-                cursorLine = SETNAME;
+                cursorLine = SETNAME; //update to the first page
                 else
                     if(cursorLine == CONTRAST)
                     cursorLine = EXIT;
                 else
                     cursorLine++;
+            //Update Page displayed Accordingly
             if(cursorLine == EXIT)
                 {
                     menu.clear();
@@ -285,7 +295,7 @@ int Game::optionsDisplay()
                     cursorLine = 1;
                     cursorPosition = 0;
                     lastScroll = millis();
-                    return -1;
+                    return -1; //value -1 means the current Menu Page has been Exited
 
                 }
             }
@@ -333,7 +343,8 @@ void Game::printName()
 
     menu.setCursor(0,0);
         if(nameSize == 0)
-            menu.print("???");
+            menu.print("???"); // if no nam has been selected , the name of the player is ??? by default
+                                // Gameboy-style RPGs Nostalgia
         else
             for(int i = 0;i< nameSize; i++)
             {
@@ -352,7 +363,7 @@ int Game::setName()
         if(valY != 0 )
         {
             menu.clear();
-            if(valY  == 1)
+            if(valY  == 1) // value of 1 means scroll upwards, in descending lexicographical order
                 if(playerName[cursorPosition] == 'Z')
                     playerName[cursorPosition ] = ' ';
                 else
@@ -360,7 +371,7 @@ int Game::setName()
                     playerName[cursorPosition ] = 'A';
                     else
                     playerName[cursorPosition ] ++;
-            if(valY == -1)
+            if(valY == -1) // value -1 means scrolling downard, in ascending lexigraphical oreder
                 if(playerName[cursorPosition] == 'A')
                     playerName[cursorPosition ] = ' ';
                 else
@@ -371,10 +382,10 @@ int Game::setName()
             printName();
 
         }
-        if(valX != 0 )
+        if(valX != 0 ) // if scrolling on the X- axis
         {
 
-            if(valX  == 1)
+            if(valX  == 1) // right scroll means a new charater must be added to the name
                 {
                     cursorPosition++;
                     if(cursorPosition >= nameSize)
@@ -385,7 +396,7 @@ int Game::setName()
                     if(cursorPosition > MAXNAMESIZE)
                         cursorPosition = 0;
                 }
-            if(valX == -1)
+            if(valX == -1) // left scroll means select aprevious character in the name
                 {
                     cursorPosition--;
                     if(cursorPosition < 0)
@@ -397,7 +408,7 @@ int Game::setName()
         }
 
 
-        if(j.debounce() == 1)
+        if(j.debounce() == 1) //pressing the button will exit Name Menu
             {
                 menu.clear();
                 cursorLine = 0;
@@ -448,6 +459,7 @@ void Game::endGame()
     menu.setCursor(0,1);
     menu.print("GOOD GAME!");
     delay(1500);
+    //player is informed if a new HighScore has been reached
     if(player.score > EEPROM.read(HIADDR))
         {
             menu.clear();
@@ -471,6 +483,7 @@ void Game::postGame()
     menu.print("  MENU");
 
 }
+//Player is presented with 2 Options upon finishing a session: REPLAY or BACK TO MENU
 int Game::whatNext()
 {
     menu.setCursor(cursorPosition,cursorLine);
@@ -553,6 +566,8 @@ contrastVal(100),contrastPin(9),nameSize(0),hiScore(0),addFactor(1)
     analogWrite(contrastPin,contrastVal);
     menu.begin(16,2);
     menu.clear();
+
+    //Allow the player to have at most 16 charaters in the Name
     playerName = new char[MAXNAMESIZE];
     for(int i = 0;i< MAXNAMESIZE; i++)
         playerName[i] = 'A';
@@ -563,7 +578,7 @@ contrastVal(100),contrastPin(9),nameSize(0),hiScore(0),addFactor(1)
     currentPosition = 0;
     minSpawn = activeEnemies;
     for(int i = 0; i < MAPSIZE; i++)
-    {//    Serial.println("Passed Update Pos");
+    {
         for(int j = 0; j < MAPSIZE; j ++ )
             if(levels[currentLevel][i * MAPSIZE + j] == 1)
         {
@@ -572,6 +587,8 @@ contrastVal(100),contrastPin(9),nameSize(0),hiScore(0),addFactor(1)
             eSize++;
         }
     }
+
+    //Index array is in the beginning set in order
     for(int i = 0 ; i < eSize; i++)
         idx[i] = i;
     nextMove = false;
@@ -584,6 +601,8 @@ Game::~Game()
     delete []idx;
 
 }
+
+//Lets the player get ready by a "3-2-1-GO!" style Message
 void Game::preLevel()
 {
     menu.clear();
@@ -613,6 +632,8 @@ void Game::preLevel()
     menu.clear();
     inGameMenu();
 }
+
+//Update Level from the Levels Matrix
 void Game::progress()
 {
     currentLevel ++;
@@ -634,6 +655,7 @@ void Game::progress()
     //delay for selecting random enemy to shoot
     lastSelected = 0;
 
+    //Update the new positions of the Enemies
     for(int i = 0; i < MAPSIZE; i++)
     {
         for(int j = 0; j < MAPSIZE; j ++ )
@@ -646,6 +668,7 @@ void Game::progress()
         }
     }
 
+    //Initially each Enemy is in position i which it has been detected, starting from (0,0)
     for(int i = 0 ; i < eSize; i++)
         idx[i] = i;
 
@@ -660,15 +683,21 @@ void Game::progress()
 
 }
 
+//Checks if a any Enemy is at the (X,Y) coordinates
 bool Game::shootEnemy(const byte Y, const byte X)
 {
 
     for(int i = 0; i < eSize; i++)
         if(eArray[idx[i]].posX == X && eArray[idx[i]].posY == Y)
         {
+            //if So, then Enemy loses a life
             eArray[idx[i]].lives--;
+
+
             if(eArray[idx[i]].lives <= 0)
             {
+                //Delete the Enemy for the Array by Effectively moving it to the last position and
+                //Decrementing the Size pointer
                 eArray[idx[i]].active = true;
                 int temp = idx[i];
                 idx[i] = idx[eSize - 1];
@@ -682,6 +711,7 @@ bool Game::shootEnemy(const byte Y, const byte X)
     return 0;
 
 }
+
 int Game::onGoing()
 {
     if(eSize == 0)
@@ -696,7 +726,7 @@ int Game::onGoing()
         currentPosition = 0;
         postGame();
 
-        return 2; //2 is the code f
+        return 2; //2 is the code for Exiting a session, in this case a WIN
 
       }
       progress();
@@ -739,7 +769,7 @@ int Game::onGoing()
         else
         if( y <= 0)
         {
-          player.doneShoot();
+          player.doneShoot(); //erase the bullet from the map
             lc.setLed(0,y,x,false);
         }
       }
@@ -765,9 +795,10 @@ int Game::onGoing()
 
             if(nextMove == true)
             {
+                //if the movement Delay is passed
                 int j = i;
                 if(dx[currentLevel][currentPosition] == 1 ||
-                   dy[currentLevel][currentPosition] == 1 )
+                   dy[currentLevel][currentPosition] == 1 ) // check for possible collisions between enemies. Might "cover" one another and make some invisible
                     j = eSize - i - 1;
                 eArray[idx[j]].updatePos(dx[currentLevel][currentPosition]
                                      ,dy[currentLevel][currentPosition]
@@ -784,7 +815,7 @@ int Game::onGoing()
                     }
                 }
                 else
-                    if(eArray[kth].hasShot() == true)
+                    if(eArray[kth].hasShot() == true) // as for the Plyer, an Enemy has either a travelling bullet or not on the Map
                 {
 
                     eArray[kth].travellingBullet(lc);
@@ -825,15 +856,6 @@ int Game::onGoing()
         if(millis() - lastMovement >= movementDelay)
             {
                 nextMove = true;
-//                if(currentLevel == LEVELS - 1 )
-//                    if(currentPosition == LEVELS - 1)
-//                    {
-//                        addFactor *= -1;
-//                    }
-//                    else
-//                        if(currentPosition == 0)
-//                        if(addFactor == -1)
-//                        addFactor *= -1;
                     currentPosition = (currentPosition + 1) % LEVELS;
                     lastMovement = millis();
             }
@@ -845,6 +867,7 @@ int Game::onGoing()
 
 }
 
+//Resets the variables of an onGoint session, by re-entering with level 1
 void Game::replay()
 {
     currentLevel = -1;

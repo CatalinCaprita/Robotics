@@ -1,6 +1,8 @@
 #include "Joystick.h"
 #include "Arduino.h"
 
+/*Joystick constructor which sets the values given for the pins which read the analog Data
+for the X and Y movements as well as the SW button press*/
 
 Joystick::Joystick(byte pX = A0, byte pY = A1, byte pSw = A2):debounceDelay(100),lastDebounce(0),movedX(false),movedY(false),swState(1),lastSwState(1),maxThreshold(550),minThreshold(400),axisReadTime(150),lastReadX(0),lastReadY(0)
 {
@@ -9,6 +11,8 @@ Joystick::Joystick(byte pX = A0, byte pY = A1, byte pSw = A2):debounceDelay(100)
     pinSw = pSw;
     pinMode(pinX,INPUT);
     pinMode(pinY,INPUT);
+
+    /*SW Is set with in-built Arduino Resistance*/
     pinMode(pinSw,INPUT_PULLUP);
 }
 
@@ -48,12 +52,12 @@ int Joystick::readMoveY()
       if(valY >= maxThreshold && movedY == false)
         {
           movedY = true;
-            return 1; // meaning the position must be updated to right;
+            return 1; // meaning the position must be updated to up;
         }
       if(valY <= minThreshold && movedY == false)
         {
                 movedY = true;
-        return -1; //meaning position must be updated to left
+        return -1; //meaning position must be updated to down
         }
         else
          {
@@ -85,7 +89,7 @@ int Joystick::debounce()
         {
             swState = swRead;
         }
-        //if The button has actually been pressed
+        //If The button has actually been pressed it is detected as true
         if(swRead == 0)
         {
             lastSwState = swState;
