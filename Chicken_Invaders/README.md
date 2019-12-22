@@ -1,5 +1,6 @@
-#Matrix Heroes
-##Introduction
+# Matrix Heroes
+---
+## Introduction
   One of the few actually qualified enough to undergo such an extreme mission, You PewPew Mc.Shootingson have
 recieved the honour to venture into the unkown of the Cosmos in search of extraterrestrial life.
 Board Journal Entry: Year 2019, 31st of December. Happy New Year to Yourself, the only one privilledged to 
@@ -9,7 +10,7 @@ space ship. It's Heading Towards You! It LAUNCHED....
 Chicken? It doesn't matter what they look like, it is impossible to be chicken! You do not know what is going to happen
 so ARM UP AND FIGHT FOR YOUR LIFE!
 
-##Table of Contents
+## Table of Contents
 * [General Info] (# general-info)
 * [How To Play?] (# how-to-play)
 * [Demonstrative Video] (# demonstrative-video)
@@ -44,7 +45,7 @@ is likely to have between 1 and the level number of lives so if they don't get e
 
 ## Demonstrative Video
 --- 
-
+[Link](https://www.youtube.com/watch?v=rVG6xQdty2I)
 ## Technologies
 ---
 * C++ version: 11 
