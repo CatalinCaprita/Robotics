@@ -11,11 +11,11 @@ Chicken? It doesn't matter what they look like, it is impossible to be chicken! 
 so ARM UP AND FIGHT FOR YOUR LIFE!
 
 ## Table of Contents
-* [General Info] (# general-info)
-* [How To Play?] (# how-to-play)
-* [Demonstrative Video] (# demonstrative-video)
-* [Technologies] (# technologies)
-* [Hardware Components]) (# hardware-components)
+* [General Info](#general-info)
+* [How To Play?](#how-to-play)
+* [Demonstrative Video](#demonstrative-video)
+* [Technologies](#technologies)
+* [Hardware Components])(#hardware-components)
 
 
 ## General Info
@@ -28,13 +28,13 @@ with a menu on an LCD controller, with several options such as adding a name, se
 information about the game.
 
 ## How To Play?
-###'What's my Goal?'
+### 'What's my Goal?'
 ---
   Be the hero of our Planet! Use your in-built ship guns to destroy as many enemy space-ships as possible! 
 Be aware that the extraterrestrials will not stand and embrace their end. they fight back as well! Work your way up
 through the levels up to the final Boss of the System!
 
-###'How do I play ?'
+### 'How do I play ?'
   Using the joystick, you can move left, right up and down. By pressing the joystick's button you can shoot
 the enemies. If any of your projectiles targets an enemy space-ship, you are awarded with 10 points. Each time
 an enemy projectile hits you, you lose one of your lives. 
