@@ -34,6 +34,7 @@ The implementation also uses PID control for the motors that control the wheels 
 5. Wires
 6. Breadboard
 7. Wheels
+---
 ![Front](https://imgur.com/a/haay68e)
 ![Sides](https://imgur.com/a/tLnTqJQ)
-![Back](https://imgur.com/a/Lr6cX5n)
+![Back](LaboratoryHomeworks/Final_Project/assemble2.jpg)
