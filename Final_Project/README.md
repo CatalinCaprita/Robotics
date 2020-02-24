@@ -37,4 +37,4 @@ The implementation also uses PID control for the motors that control the wheels 
 ---
 ![Front](https://imgur.com/a/haay68e)
 ![Sides](https://imgur.com/a/tLnTqJQ)
-![Back](LaboratoryHomeworks/Final_Project/assemble2.jpg)
+![Back](https://i.postimg.cc/pXgc3gqs/assemble3.jpg)
